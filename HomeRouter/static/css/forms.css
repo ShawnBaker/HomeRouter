@@ -1,0 +1,69 @@
+.hr-form-login {
+	max-width: 300px;
+	margin: 80px auto 0 auto;
+	padding: 10px 20px;
+}
+
+.hr-status {
+	margin: 15px;
+	padding: 10px 20px;
+}
+
+.hr-form-user {
+	max-width: 500px;
+	margin: 80px auto 0 auto;
+	padding: 10px 20px;
+}
+
+.hr-form-system {
+	max-width: 400px;
+	margin: 80px auto 0 auto;
+	padding: 10px 20px;
+}
+
+.hr-form-wan {
+	max-width: 500px;
+	margin: 80px auto 0 auto;
+	padding: 10px 20px;
+}
+
+.hr-form-lan {
+	max-width: 500px;
+	margin: 80px auto 0 auto;
+	padding: 10px 20px;
+}
+
+.hr-form-error {
+	padding: 3px;
+}
+
+.hr-form-header {
+	margin: 10px auto;
+}
+
+.hr-form-label {
+	margin: 0 auto;
+}
+
+.hr-form-row {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.hr-form-button-row {
+	margin-top: 15px;
+	margin-bottom: 5px;
+}
+
+.hr-disabled-input {
+	background-color: #ced4da;
+}
+
+.hr-disabled-label {
+	color: #adb5bd;
+}
+
+.val-error {
+	margin-top: 6px !important;
+	padding: 3px !important;
+}

@@ -1,0 +1,108 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<form id="system" name="system" action="" method=post class="hr-form-system bg-secondary text-white rounded">
+	{{ form.csrf_token }}
+	<div class="form-group">
+		<h5 class="hr-form-header text-center text-uppercase">System</h5>
+	</div>
+	{% for field in form %}
+		<div class="form-group hr-form-row row">
+			{% if field.type == "BooleanField" %}
+				<div class="col-sm-3 col-form-label"></div>
+				<div class="col-sm-9">
+					<label class="form-check-label">
+						{{ field(class="form-check-input") }} {{ field.label.text }}
+					</label>
+				</div>
+			{% else %}
+				{{ field.label(class="col-sm-3 col-form-label") }}
+				<div class="col-sm-9">
+					{{ field(class="form-control") }}
+				</div>
+			{% endif %}
+		</div>
+	{% endfor %}
+	<div id="error-group" id="name-group" class="form-group">
+		<p class="hr-form-error bg-danger rounded text-white text-center">{{session['system_error']}}</p>
+	</div>
+	<div class="form-group hr-form-button-row row justify-content-center">
+		<button type="submit" class="btn btn-primary">Update</button>
+	</div>
+</form>
+{% endblock %}
+{% block javascript %}
+$('#lan').change(validate_lan_wan);
+$('#wan').change(validate_lan_wan);
+
+$(document).ready(function()
+{
+	validate_lan_wan();
+	{% if session['system_error'] %}
+		$("#error-group").show();
+	{% endif %}
+	$("#system").validate(
+	{
+		submitHandler: function(form)
+		{
+			return validate_lan_wan();
+		}
+	});
+});
+
+function validate_lan_wan()
+{
+	var lan = $("#lan").val();
+	var wan = $("#wan").val();
+
+	var def = $("#lan option").filter(function () { return this.defaultSelected; });
+	var original = def ? def.val() : '';
+	var row = $("#lan_keep_settings").closest('.row');
+	if (lan != original)
+	{
+		$("#lan").addClass('text-danger');
+		if (lan != 'none' && original != 'none')
+			row.show();
+		else
+			row.hide();
+	}
+	else
+	{
+		$("#lan").removeClass('text-danger');
+		row.hide();
+	}
+
+	def = $("#wan option").filter(function () { return this.defaultSelected; });
+	original = def ? def.val() : '';
+	row = $("#wan_keep_settings").closest('.row');
+	if (wan != original)
+	{
+		$("#wan").addClass('text-danger');
+		if (wan != 'none' && original != 'none')
+			row.show();
+		else
+			row.hide();
+	}
+	else
+	{
+		$("#wan").removeClass('text-danger');
+		row.hide();
+	}
+
+	$("#error-group").hide();
+	if ((lan != 'none' || wan != 'none') && lan == wan)
+	{
+		$("#error-group").find("p").text("The LAN and WAN interfaces cannot be the same.");
+		$("#error-group").show();
+		$('button').prop('disabled', true);
+		return false;
+	}
+	else
+	{
+		$('button').prop('disabled', false);
+	}
+
+	return true;
+}
+{% endblock %}

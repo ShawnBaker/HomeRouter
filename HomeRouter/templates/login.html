@@ -1,0 +1,26 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<form id="login" name="login" action="" method=post class="hr-form-login bg-secondary text-white rounded">
+	{{ form.csrf_token }}
+	<div class="form-group">
+		<h5 class="hr-form-header text-center text-uppercase">Please Log In</h5>
+	</div>
+	{% for field in form %}
+		<div class="form-group">
+			{{ field(class="form-control",placeholder=field.label.text, autocomplete="off",
+				autocorrect="off", autocapitalize="off", spellcheck="false", autofocus="autofocus",
+				required='required') }}
+		</div>
+	{% endfor %}
+	{% if session['login_error'] %}
+	<div class="form-group">
+		<p class="hr-form-error bg-danger rounded text-white text-center">{{session['login_error']}}</p>
+	</div>
+	{% endif %}
+	<div class="form-group">
+		<button type="submit" class="btn btn-primary btn-block">Login</button>
+	</div>
+</form>
+{% endblock %}

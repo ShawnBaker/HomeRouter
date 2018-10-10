@@ -1,0 +1,26 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<form id="user" name="user" action="" method=post class="hr-form-user bg-secondary text-white rounded">
+	{{ form.csrf_token }}
+	<div class="form-group">
+		<h5 class="hr-form-header text-center text-uppercase">User Information</h5>
+	</div>
+	{% for field in form %}
+		<div class="form-group">
+			{{ field.label(class="hr-form-label") }}
+			{{ field(class="form-control") }}
+		</div>
+	{% endfor %}
+	{% if session['user_error'] %}
+	<div class="form-group">
+		<p class="hr-form-error bg-danger rounded text-white text-center">{{session['user_error']}}</p>
+	</div>
+	{% endif %}
+	<div class="form-group">
+		<button type="submit" class="btn btn-primary">Update</button>
+		<button type="button" class="btn btn-primary float-right">Change Password</button>
+	</div>
+</form>
+{% endblock %}

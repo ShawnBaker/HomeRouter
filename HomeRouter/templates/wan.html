@@ -1,0 +1,119 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<form id="wan" name="wan" action="" method=post class="hr-form-wan bg-secondary text-white rounded">
+	{{ form.csrf_token }}
+	<div class="form-group">
+		<h5 class="hr-form-header text-center text-uppercase">WAN Configuration</h5>
+	</div>
+	<div class="form-group hr-form-row row">
+		<div class="col-sm-4 col-form-label">Interface</div>
+		<div class="col-sm-8 col-form-label">{{ g.settings.wan_interface }}</div>
+	</div>
+	{% for field in form %}
+		{% set hidden = '' %}
+		{% if g.dhcp == "dhcp" %}
+			{% if field.name == "address" or field.name == "netmask" or field.name == "gateway" %}
+				{% set hidden = 'style="display=none;"' %}
+			{% endif %}
+		{% else %}
+			{% if field.name == "hostname" or field.name == "unicast" %}
+				{% set hidden = 'style="display=none;"' %}
+			{% endif %}
+		{% endif %}
+		<div class="form-group hr-form-row row" {{ hidden }}>
+			{% if field.type == "BooleanField" %}
+				<div class="col-sm-4 col-form-label"></div>
+				<div class="col-sm-8">
+					<label class="form-check-label">
+						{{ field(class="form-check-input") }} {{ field.label.text }}
+					</label>
+				</div>
+			{% else %}
+				{{ field.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ field(class="form-control") }}
+				</div>
+			{% endif %}
+		</div>
+	{% endfor %}
+	{% if session['wan_error'] %}
+	<div class="form-group">
+		<p class="hr-form-error bg-danger rounded text-white text-center">{{session['wan_error']}}</p>
+	</div>
+	{% endif %}
+	<div class="form-group hr-form-button-row row justify-content-center">
+		<button type="submit" class="btn btn-primary">Update</button>
+	</div>
+</form>
+{% endblock %}
+{% block javascript %}
+$(document).ready(function()
+{
+	ConfigureConnection();
+
+	jQuery.validator.addMethod('mac', function(value, element)
+	{
+		var regex = new RegExp(/^[0-9A-Fa-f]{2}([\.:-])([0-9A-Fa-f]{2}\1){4}[0-9A-Fa-f]{2}$/);
+		return (this.optional(element) != false) || regex.test(value);
+	},
+	'Invalid MAC Address');
+
+	$('#wan').validate(
+	{
+		rules:
+		{
+			address: 'ipv4',
+			netmask: 'netmask',
+			gateway: 'ipv4',
+			dns1: 'ipv4',
+			dns2: 'ipv4',
+			mtu: {
+				digits: true,
+				range: [68, 65536]
+			},
+			mac: 'mac'
+		},
+/*
+		messages:
+		{
+			wan: { notEqualTo: "You must choose different interfaces for LAN and WAN." }
+		},
+*/
+		errorClass: "val-error bg-danger rounded text-white text-center",
+		highlight: function(element, errorClass, validClass)
+		{
+			$("#wan-error").addClass(errorClass);
+		},
+		unhighlight: function(element, errorClass, validClass)
+		{
+			$("#wan-error").removeClass(errorClass);
+		}
+	});
+});
+$('#connection').change(ConfigureConnection);
+
+function ConfigureConnection()
+{
+	var value = $('#connection').val();
+	if (value == 'static')
+	{
+		$('#address').closest('.row').show();
+		$('#netmask').closest('.row').show();
+		$('#gateway').closest('.row').show();
+		
+		$('#hostname').closest('.row').hide();
+		$('#unicast').closest('.row').hide();
+	}
+	else if (value == 'dhcp')
+	{
+		$('#hostname').closest('.row').show();
+		$('#unicast').closest('.row').show();
+		
+		$('#address').closest('.row').hide();
+		$('#netmask').closest('.row').hide();
+		$('#gateway').closest('.row').hide();
+	}
+}
+{% endblock %}

@@ -1,0 +1,124 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+	<div class="col-sm hr-status bg-secondary text-white rounded">
+		<h5 class="hr-form-header text-center text-uppercase">System Status</h5>
+		<div class="row">
+			<div class="col-sm-6 text-right">Host Name</div>
+			<div class="col-sm-6 text-left">{{ sys.host_name }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Domain Name</div>
+			<div class="col-sm-6 text-left">{{ sys.domain_name }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">WAN Interface</div>
+			<div class="col-sm-6 text-left">{{ wan.name }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">LAN Interface</div>
+			<div class="col-sm-6 text-left">{{ lan.name }}</div>
+		</div>
+	</div>
+	<div class="col-sm hr-status bg-secondary text-white rounded">
+		<h5 class="hr-form-header text-center text-uppercase">WAN Status</h5>
+		<div class="row">
+			<div class="col-sm-6 text-right">Device</div>
+			<div class="col-sm-6 text-left">{{ wan.name }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Type</div>
+			<div class="col-sm-6 text-left">{{ 'DHCP Client' if wan.type == 'dhcp' else 'Static IP' }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">IP Address</div>
+			<div class="col-sm-6 text-left">{{ wan.address }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Subnet Mask</div>
+			<div class="col-sm-6 text-left">{{ wan.netmask }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Default Gateway</div>
+			<div class="col-sm-6 text-left">{{ wan.gateway }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Primary DNS</div>
+			<div class="col-sm-6 text-left">{{ wan.dns1 }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Secondary DNS</div>
+			<div class="col-sm-6 text-left">{{ wan.dns2 }}</div>
+		</div>
+	</div>
+	<div class="col-sm hr-status bg-secondary text-white rounded">
+		<h5 class="hr-form-header text-center text-uppercase">LAN Status</h5>
+		<div class="row">
+			<div class="col-sm-6 text-right">Device</div>
+			<div class="col-sm-6 text-left">{{ lan.name }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Type</div>
+			<div class="col-sm-6 text-left">{{ 'DHCP Client' if lan.type == 'dhcp' else 'Static IP' }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">IP Address</div>
+			<div class="col-sm-6 text-left">{{ lan.address }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Subnet Mask</div>
+			<div class="col-sm-6 text-left">{{ lan.netmask }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Primary DNS</div>
+			<div class="col-sm-6 text-left">{{ lan.dns1 }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">Secondary DNS</div>
+			<div class="col-sm-6 text-left">{{ lan.dns2 }}</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 text-right">DHCP Server</div>
+			<div class="col-sm-6 text-left">{{ 'Yes' if lan.is_dhcp_server else 'No' }}</div>
+		</div>
+		{% if lan.is_dhcp_server %}
+			<div class="row">
+				<div class="col-sm-6 text-right">From Address</div>
+				<div class="col-sm-6 text-left">{{ lan.from_address }}</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6 text-right">To Address</div>
+				<div class="col-sm-6 text-left">{{ lan.to_address }}</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6 text-right">Lease Time</div>
+				<div class="col-sm-6 text-left">{{ lan.lease_time }}</div>
+			</div>
+		{% endif %}
+	</div>
+</div>
+{% if lan.is_dhcp_server %}
+<div class="row justify-content-center">
+	<div class="col-sm-auto hr-status bg-secondary text-white rounded">
+		<h5 class="hr-form-header text-center text-uppercase">DHCP STATUS</h5>
+		{% if leases|length > 0 %}
+			{% for lease in leases %}
+				<div class="row">
+					<div class="col-sm-3 text-left">{{ lease['time'] }}</div>
+					<div class="col-sm-3 text-left">{{ lease['mac'] }}</div>
+					<div class="col-sm-3 text-left">{{ lease['address'] }}</div>
+					<div class="col-sm-3 text-left">{{ lease['name'] }}</div>
+				</div>
+			{% endfor %}
+		{% else %}
+			<div class="row">
+				<div class="col-sm text-center">no leases</div>
+			</div>
+		{% endif %}
+	</div>
+</div>
+{% endif %}
+
+{% endblock %}
