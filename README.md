@@ -1,4 +1,4 @@
-# RPi Camera Viewer
+# Home Router
 
 Installation scripts and web management interface for creating
 a simple home router based on Ubuntu Server 18.04.
@@ -33,5 +33,5 @@ Copyright &copy; 2018 Shawn Baker using the [MIT License](https://opensource.org
     * ex: sudo ./install-net.sh enp4s5 192.168.0.10 my.domain enp4s6 11:22:33:44:55:66
   * wait for the system to reboot
 * plug in your WAN cable and disconnect your router
-  * it might take some time for all your devices to adjust to the new server/router
-* go to http://server-IP:5000 and log in with your system user name and password
+  * it might take some time for your existing devices to adjust to the new server/router
+* go to http://server-IP:8801 and log in with your system user name and password
