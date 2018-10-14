@@ -7,7 +7,7 @@ if [ -z "$SUDO_USER" ]; then
     exit 1
 fi
 
-USAGE="Usage: $0 internal-interface internal-address external-interface
+USAGE="Usage: $0 lan-interface lan-address wan-interface
    ex: sudo $0 enp0s3 192.168.0.0 enp0s8"
 
 # get the parameters
@@ -15,10 +15,10 @@ if [ "$#" -ne 3 ]; then
 	echo -e "$USAGE"
     exit
 fi
-INT_IF="$1"
-INT_IP="$2"
-EXT_IF="$3"
-INT_NET="${INT_IP%.*}.0/24"
+LAN_IF="$1"
+LAN_IP="$2"
+WAN_IF="$3"
+LAN_NET="${LAN_IP%.*}.0/24"
 
 UFW_FILE="/etc/default/ufw"
 SYSCTL_FILE="/etc/ufw/sysctl.conf"
@@ -37,9 +37,9 @@ sed -i "s/^.*\(DEFAULT_FORWARD_POLICY\)=\".*\".*$/\1=\"ACCEPT\"/" $UFW_FILE
 sed -i "s/^.*\(net\/ipv4\/ip_forward\)=.*$/\1=1/" $SYSCTL_FILE
 sed -i "s/^.*\(net\/ipv6\/conf\/default\/forwarding\)=.*$/\1=1/" $SYSCTL_FILE
 
-# route the internal network to the external interface
+# route the LAN to the WAN
 if grep -qe "-A POSTROUTING" $BEFORE_RULES_FILE; then
-	sed -i "s/^\(-A POSTROUTING\).*$/\1 -s $INT_NET -o $EXT_IF -j MASQUERADE/" $BEFORE_RULES_FILE
+	sed -i "s/^\(-A POSTROUTING\).*$/\1 -s $LAN_NET -o $WAN_IF -j MASQUERADE/" $BEFORE_RULES_FILE
 else
 	ed -s $BEFORE_RULES_FILE << BEFORE_RULES_END
 0a
@@ -47,8 +47,8 @@ else
 *nat
 :POSTROUTING ACCEPT [0:0]
 
-# Forward traffic from eth1 through $EXT_IF.
--A POSTROUTING -s $INT_NET -o $EXT_IF -j MASQUERADE
+# Forward traffic from $LAN_IF through $WAN_IF.
+-A POSTROUTING -s $LAN_NET -o $WAN_IF -j MASQUERADE
 
 # don't delete the 'COMMIT' line or these nat table rules won't be processed
 COMMIT
@@ -56,24 +56,22 @@ COMMIT
 w
 BEFORE_RULES_END
 fi
-#-A ufw-before-input -p udp --sport 67 --dport 68 -j ACCEPT
-#-A ufw-before-input -p udp -i $INT_IF --sport 67:68 --dport 67:68 -j ACCEPT
 
 # enable SSH on the internal network
-ufw allow from $INT_NET to any port 22 proto tcp
+ufw allow from $LAN_NET to any port 22 proto tcp
 
 # enable HTTP and HTTPS on the internal network
-ufw allow from $INT_NET to any port 80,443 proto tcp
+#ufw allow from $LAN_NET to any port 80,443 proto tcp
 
 # enable DHCP server on the internal network
-ufw allow in on $INT_IF from any port 68 to any port 67 proto udp
+ufw allow in on $LAN_IF from any port 68 to any port 67 proto udp
 
 # allow DNS server on the internal network
-ufw allow from $INT_NET to $INT_IP proto tcp port 53 
-ufw allow from $INT_NET to $INT_IP proto udp port 53
+ufw allow from $LAN_NET to $LAN_IP proto tcp port 53 
+ufw allow from $LAN_NET to $LAN_IP proto udp port 53
 
 # allow the website port
-ufw allow from $INT_NET to any port 5000 proto tcp
+ufw allow from $LAN_NET to any port 8801 proto tcp
 
 # enable UFW
 ufw -f enable
