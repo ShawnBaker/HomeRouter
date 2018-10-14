@@ -125,10 +125,11 @@ class Interface():
 			self.type = 'dhcp' if dhcp else 'static'
 			if dhcp:
 				addrs = netifaces.ifaddresses(name)
-				links = addrs[netifaces.AF_INET]
-				if links:
-					self.address = links[0].get('addr', '')
-					self.netmask = links[0].get('netmask', '')
+				if addrs:
+					links = addrs.get(netifaces.AF_INET, None)
+					if links:
+						self.address = links[0].get('addr', '')
+						self.netmask = links[0].get('netmask', '')
 			else:
 				addrs = self.interface.get('addresses', [])
 				if len(addrs) > 0:
