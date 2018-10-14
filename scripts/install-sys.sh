@@ -29,7 +29,9 @@ apt-get autoclean -y
 # don't require sudo passwords
 SUDOERS_FILE="/etc/sudoers"
 sed -i "/$SUDO_USER/d" $SUDOERS_FILE
-echo "$SUDO_USER ALL=(ALL) NOPASSWD: ALL" | sudo tee -a $SUDOERS_FILE
+tee -a $SUDOERS_FILE > /dev/null << SUDOERS_END
+$SUDO_USER ALL=(ALL) NOPASSWD: ALL
+SUDOERS_END
 
 # configure SSH, no root or password logins
 # from remote machine: ssh-copy-id user@server
