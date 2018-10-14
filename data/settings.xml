@@ -1,4 +1,4 @@
 <settings>
-	<lan-interface />
-	<wan-interface />
+	<lan-interface></lan-interface>
+	<wan-interface></wan-interface>
 </settings>
