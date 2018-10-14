@@ -22,6 +22,6 @@ pip install flask-sslify
 pip install netifaces
 pip install pyyaml
 pip install python-pam
-#pip install gunicorn
+pip install gunicorn
 
 deactivate
